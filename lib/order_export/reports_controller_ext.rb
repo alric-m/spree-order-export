@@ -36,7 +36,7 @@ module OrderExport
               t('order_export_ext.header.completed_at'),
               t('order_export_ext.header.number'),
               t('order_export_ext.header.name'),
-              t('order_export_ext.header.shipping_address'),
+              t('order_export_ext.header.address'),
               t('order_export_ext.header.phone'),
               t('order_export_ext.header.email'),
               t('order_export_ext.header.variant_name'),
