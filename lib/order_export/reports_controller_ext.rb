@@ -12,10 +12,12 @@ module OrderExport
 
           if !params[:q][:created_at_gt].blank?
             params[:q][:created_at_gt] = Time.zone.parse(params[:q][:created_at_gt]).beginning_of_day rescue ""
+            format_gt = params[:q][:created_at_gt].strftime('%Y%m%d')
           end
 
           if !params[:q][:created_at_lt].blank?
             params[:q][:created_at_lt] = Time.zone.parse(params[:q][:created_at_lt]).end_of_day rescue ""
+            format_lt = params[:q][:created_at_lt].strftime('%Y%m%d')
           end
 
           if @show_only_completed
@@ -28,13 +30,13 @@ module OrderExport
 
           render and return unless export
 
-          orders_export = FasterCSV.generate(:col_sep => ",", :row_sep => "\r\n") do |csv|
+          orders_export = CSV.generate(:col_sep => ",", :row_sep => "\r\n") do |csv|
             headers = [
               t('order_export_ext.header.last_updated'),
               t('order_export_ext.header.completed_at'),
               t('order_export_ext.header.number'),
               t('order_export_ext.header.name'),
-              t('order_export_ext.header.address'),
+              t('order_export_ext.header.shipping_address'),
               t('order_export_ext.header.phone'),
               t('order_export_ext.header.email'),
               t('order_export_ext.header.variant_name'),
@@ -52,14 +54,14 @@ module OrderExport
                 csv_line << order.number
 
                 if order.bill_address
-                  csv_line << order.bill_address.full_name
+                  csv_line << order.shipment.full_name
                   address_line = ""
-                  address_line << order.bill_address.address1 + " " if order.bill_address.address1?
-                  address_line << order.bill_address.address2 + " " if order.bill_address.address2?
-                  address_line << order.bill_address.city + " " if order.bill_address.city?
-                  address_line << order.bill_address.country.name + " " if order.bill_address.country_id?
+                  address_line << order.shipment.address1 + " " if order.shipment.address1?
+                  address_line << order.shipment.address2 + " " if order.shipment.address2?
+                  address_line << order.shipment.city + " " if order.shipment.city?
+                  address_line << order.shipment.country.name + " " if order.shipment.country_id?
                   csv_line << address_line
-                  csv_line << order.bill_address.phone if order.bill_address.phone?
+                  csv_line << order.shipment.phone if order.shipment.phone?
                 else
                   csv_line << ""
                   csv_line << ""
@@ -72,7 +74,13 @@ module OrderExport
               end
             end
           end
-          send_data orders_export, :type => 'text/csv', :filename => "Footnotes-orders-#{Time.now.strftime('%Y%m%d')}.csv"
+
+          if format_gt && format_lt
+            file_time = [format_gt, format_lt].join('-')
+          else
+            file_time = Time.now.strftime('%Y%m%d')
+          end
+          send_data orders_export, :type => 'text/csv', :filename => "Footnotes-orders-#{file_time}.csv"
         end
       end
     end
