@@ -4,34 +4,31 @@ module OrderExport
       base.class_eval do
 
         def order_export
-          export = !params[:search].nil?
-          params[:search] = {} unless params[:search]
+          export = !params[:q].nil?
+          params[:q] ||= {}
+          params[:q][:completed_at_not_null] ||= '1' if Spree::Config[:show_only_complete_orders_by_default]
+          @show_only_completed = params[:q][:completed_at_not_null].present?
+          params[:q][:s] ||= @show_only_completed ? 'completed_at desc' : 'created_at desc'
 
-          if params[:search][:created_at_greater_than].blank?
-            params[:search][:created_at_greater_than] = Time.zone.now.beginning_of_month
-          else
-            params[:search][:created_at_greater_than] = Time.zone.parse(params[:search][:created_at_greater_than]).beginning_of_day rescue Time.zone.now.beginning_of_month
+          if !params[:q][:created_at_gt].blank?
+            params[:q][:created_at_gt] = Time.zone.parse(params[:q][:created_at_gt]).beginning_of_day rescue ""
           end
 
-          if params[:search] && !params[:search][:created_at_less_than].blank?
-            params[:search][:created_at_less_than] = Time.zone.parse(params[:search][:created_at_less_than]).end_of_day rescue ""
+          if !params[:q][:created_at_lt].blank?
+            params[:q][:created_at_lt] = Time.zone.parse(params[:q][:created_at_lt]).end_of_day rescue ""
           end
 
-          params[:search][:completed_at_not_null] ||= "1"
-          if params[:search].delete(:completed_at_not_null) == "1"
-            params[:search][:completed_at_not_null] = true
+          if @show_only_completed
+            params[:q][:completed_at_gt] = params[:q].delete(:created_at_gt)
+            params[:q][:completed_at_lt] = params[:q].delete(:created_at_lt)
           end
 
-          params[:search][:order] ||= "descend_by_created_at"
-
-          @search = Order.searchlogic(params[:search])
+          @search = Order.ransack(params[:q])
+          @orders = @search.result
 
           render and return unless export
 
-          @orders = @search.do_search
-
-
-          orders_export = FasterCSV.generate(:col_sep => ";", :row_sep => "\r\n") do |csv|
+          orders_export = FasterCSV.generate(:col_sep => ",", :row_sep => "\r\n") do |csv|
             headers = [
               t('order_export_ext.header.last_updated'),
               t('order_export_ext.header.completed_at'),
@@ -42,8 +39,7 @@ module OrderExport
               t('order_export_ext.header.email'),
               t('order_export_ext.header.variant_name'),
               t('order_export_ext.header.quantity'),
-              t('order_export_ext.header.order_total'),
-              t('order_export_ext.header.payment_method')
+              t('order_export_ext.header.order_total')
             ]
 
             csv << headers
@@ -72,12 +68,11 @@ module OrderExport
                 csv_line << line_item.variant.name
                 csv_line << line_item.quantity
                 csv_line << order.total.to_s
-                csv_line << order.payment_method.name
                 csv << csv_line
               end
             end
           end
-          send_data orders_export, :type => 'text/csv', :filename => "Orders-#{Time.now.strftime('%Y%m%d')}.csv"
+          send_data orders_export, :type => 'text/csv', :filename => "Footnotes-orders-#{Time.now.strftime('%Y%m%d')}.csv"
         end
       end
     end

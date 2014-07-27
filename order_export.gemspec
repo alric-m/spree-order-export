@@ -1,23 +1,28 @@
+# -*- encoding: utf-8 -*-
+# stub: order_export 1.0.0 ruby lib
+
 Gem::Specification.new do |s|
-  s.platform    = Gem::Platform::RUBY
-  s.name        = 'order_export'
-  s.version     = '1.0.0'
-  s.summary     = 'Add gem summary here'
-  #s.description = 'Add (optional) gem description here'
-  s.required_ruby_version = '>= 1.8.7'
+  s.name = "order_export"
+  s.version = "1.0.0"
 
-  # s.author            = 'David Heinemeier Hansson'
-  # s.email             = 'david@loudthinking.com'
-  # s.homepage          = 'http://www.rubyonrails.org'
-  # s.rubyforge_project = 'actionmailer'
+  s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
+  s.date = "2014-07-27"
+  s.files = ["README.md", "LICENSE", "lib/order_export", "lib/order_export/reports_controller_ext.rb", "lib/order_export.rb", "lib/order_export_hooks.rb", "lib/tasks", "lib/tasks/install.rake", "lib/tasks/order_export.rake", "app/views", "app/views/admin", "app/views/admin/reports", "app/views/admin/reports/order_export.html.erb", "app/views/admin/shared", "app/views/admin/shared/_export_criteria.html.erb", "app/views/spree", "app/views/spree/admin", "app/views/spree/admin/reports", "app/views/spree/admin/reports/order_export.html.erb", "app/views/spree/admin/shared", "app/views/spree/admin/shared/_export_criteria.html.erb"]
+  s.require_paths = ["lib"]
+  s.required_ruby_version = Gem::Requirement.new(">= 1.8.7")
+  s.requirements = ["none"]
+  s.rubygems_version = "2.1.10"
+  s.summary = "Add gem summary here"
 
-  s.files        = Dir['CHANGELOG', 'README.md', 'LICENSE', 'lib/**/*', 'app/**/*']
-  s.require_path = 'lib'
-  s.requirements << 'none'
+  if s.respond_to? :specification_version then
+    s.specification_version = 4
 
-  s.has_rdoc = true
-
-  s.add_dependency('spree_core', '>= 0.30.1')
-
+    if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
+      s.add_runtime_dependency(%q<spree_core>, [">= 0.30.1"])
+    else
+      s.add_dependency(%q<spree_core>, [">= 0.30.1"])
+    end
+  else
+    s.add_dependency(%q<spree_core>, [">= 0.30.1"])
+  end
 end
-
