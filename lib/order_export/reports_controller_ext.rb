@@ -23,7 +23,7 @@ module OrderExport
             params[:q][:completed_at_lt] = params[:q].delete(:created_at_lt)
           end
 
-          @search = Order.ransack(params[:q])
+          @search = Spree::Order.ransack(params[:q])
           @orders = @search.result
 
           render and return unless export
