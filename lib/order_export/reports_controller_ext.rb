@@ -63,9 +63,13 @@ module OrderExport
                   csv_line << order.ship_address.address1 || ""
                   csv_line << order.ship_address.address2 || ""
                   csv_line << order.ship_address.city || ""
+                  csv_line << order.ship_address.state || ""
+                  csv_line << order.ship_address.zipcode || ""
                   csv_line << order.ship_address.country.name || ""
                   csv_line << order.ship_address.phone || ""
                 else
+                  csv_line << ""
+                  csv_line << ""
                   csv_line << ""
                   csv_line << ""
                   csv_line << ""
