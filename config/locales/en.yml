@@ -9,7 +9,12 @@ en:
             completed_at: Completed at
             number: Order number
             name: Customer name
-            address: Customer address
+            address_1: Customer address 1
+            address_2: Customer address 2
+            city: Customer city
+            state: Customer state
+            zipcode: Customer zipcode
+            country: Customer country
             phone: Customer phone
             email: Customer email
             variant_name: Product name

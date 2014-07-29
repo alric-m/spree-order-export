@@ -36,7 +36,12 @@ module OrderExport
               t('order_export_ext.header.completed_at'),
               t('order_export_ext.header.number'),
               t('order_export_ext.header.name'),
-              t('order_export_ext.header.address'),
+              t('order_export_ext.header.address_1'),
+              t('order_export_ext.header.address_2'),
+              t('order_export_ext.header.city'),
+              t('order_export_ext.header.state'),
+              t('order_export_ext.header.zipcode'),
+              t('order_export_ext.header.country'),
               t('order_export_ext.header.phone'),
               t('order_export_ext.header.email'),
               t('order_export_ext.header.variant_name'),
@@ -54,15 +59,17 @@ module OrderExport
                 csv_line << order.number
 
                 if order.ship_address
-                  csv_line << order.ship_address.full_name
-                  address_line = ""
-                  address_line << order.ship_address.address1 + " " if order.ship_address.address1?
-                  address_line << order.ship_address.address2 + " " if order.ship_address.address2?
-                  address_line << order.ship_address.city + " " if order.ship_address.city?
-                  address_line << order.ship_address.country.name + " " if order.ship_address.country_id?
-                  csv_line << address_line
-                  csv_line << order.ship_address.phone if order.ship_address.phone?
+                  csv_line << order.ship_address.full_name || ""
+                  csv_line << order.ship_address.address1 || ""
+                  csv_line << order.ship_address.address2 || ""
+                  csv_line << order.ship_address.city || ""
+                  csv_line << order.ship_address.country.name || ""
+                  csv_line << order.ship_address.phone || ""
                 else
+                  csv_line << ""
+                  csv_line << ""
+                  csv_line << ""
+                  csv_line << ""
                   csv_line << ""
                   csv_line << ""
                 end
