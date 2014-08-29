@@ -1,8 +1,10 @@
 en:
     order_export: Order Export
+    sales_report: Process Sales By Date
     order_export_description: Export of orders based on information from line items.
     only_show_complete_orders: Only show complete orders?
-    order_export_help: "Use the filters on the right to adjust the date ranges for the orders you wish to export, and then click the 'Search' button to generate the file."
+    order_export_help: "Use the filters to adjust the date ranges for the orders you wish to export, and then click the 'Search' button to generate the file."
+    sales_report_help: "Use the filters to adjust the date ranges for the sales report you wish to export, and then click the 'Search' button to generate the file."
     order_export_ext:
         header:
             last_updated: Last updated

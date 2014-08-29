@@ -3,6 +3,7 @@ Spree::Core::Engine.routes.draw do
   namespace :admin do
     resources :reports do
       get 'order_export', :on => :collection
+      get 'sales_report', :on => :collection
     end
   end
 end

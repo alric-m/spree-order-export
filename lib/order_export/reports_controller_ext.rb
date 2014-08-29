@@ -93,6 +93,85 @@ module OrderExport
           end
           send_data orders_export, :type => 'text/csv', :filename => "Footnotes-orders-#{file_time}.csv"
         end
+        
+        def sales_report
+          export = !params[:q].nil?
+          params[:q] ||= {}
+          params[:q][:completed_at_not_null] = '1'
+          params[:q][:s] = 'completed_at desc'
+
+          if !params[:q][:completed_at_gt].blank?
+            params[:q][:completed_at_gt] = Time.zone.parse(params[:q][:completed_at_gt]).beginning_of_day rescue ""
+            format_gt = params[:q][:completed_at_gt].strftime('%Y%m%d')
+          end
+
+          if !params[:q][:completed_at_lt].blank?
+            params[:q][:completed_at_lt] = Time.zone.parse(params[:q][:completed_at_lt]).end_of_day rescue ""
+            format_lt = params[:q][:completed_at_lt].strftime('%Y%m%d')
+          end
+
+          @search = Spree::Order.ransack(params[:q])
+          @orders = @search.result
+
+          render and return unless export
+
+          orders_export = CSV.generate(:col_sep => ",", :row_sep => "\r\n") do |csv|
+            headers = [
+              'Date',
+              'SKU',
+              'Description',
+              'Subtotal',
+              'Tax',
+              'Promo_code',
+              'Discount',
+              'Total'
+            ]
+
+            csv << headers
+
+            subtotal = 0.0
+            tax = 0.0
+            discount = 0.0
+            total = 0.0
+            @orders.each do |order|
+              sku = []
+              desc = []
+              csv_line = []
+              promo_code = []
+              csv_line << order.completed_at
+              order.line_items.each do |line_item|               
+                sku << line_item.variant.sku
+                desc << line_item.variant.name
+              end
+              csv_line << sku.join(', ')
+              csv_line << desc.join(', ')
+              csv_line << order.display_item_total
+              csv_line << order.display_tax_total
+              order.adjustments.promotion.each do |promo|
+                promo_code << promo.originator.promotion.code
+              end
+              csv_line << promo_code.join(', ')
+              csv_line << order.promo_total.to_f
+              csv_line << order.display_total
+              csv << csv_line
+              subtotal += order.item_total.to_f
+              tax += order.tax_total.to_f
+              discount += order.promo_total.to_f
+              total += order.total
+            end
+            # Format money
+            subtotal, tax, discount, total = [subtotal, tax, discount, total].map {|item| Spree::Money.new(item, { currency: Spree::Config[:currency] })}
+            csv << ['Grand Total','','',subtotal,tax,'',discount,total]
+          end
+
+          if format_gt && format_lt
+            file_time = [format_gt, format_lt].join('-')
+          else
+            file_time = Time.now.strftime('%Y%m%d')
+          end
+          send_data orders_export, :type => 'text/csv', :filename => "Sales-Report-#{file_time}.csv"
+        end
+        
       end
     end
   end
