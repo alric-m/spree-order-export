@@ -142,9 +142,9 @@ module OrderExport
                 csv_line << order.completed_at
                 csv_line << line_item.variant.sku
                 csv_line << line_item.variant.name
-                csv_line << line_item.price
+                csv_line << line_item.single_display_amount
                 csv_line << line_item.quantity
-                csv_line << (line_item.price * line_item.quantity)
+                csv_line << line_item.display_total
                 if index == last_index
                   promo_code = []
                   csv_line << order.display_tax_total
