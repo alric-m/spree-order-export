@@ -93,7 +93,7 @@ module OrderExport
           end
           send_data orders_export, :type => 'text/csv', :filename => "Footnotes-orders-#{file_time}.csv"
         end
-        
+
         def sales_report
           export = !params[:q].nil?
           params[:q] ||= {}
@@ -120,6 +120,8 @@ module OrderExport
               'Date',
               'SKU',
               'Description',
+              'Price',
+              'Quantity',
               'Subtotal',
               'Tax',
               'Promo_code',
@@ -134,26 +136,32 @@ module OrderExport
             discount = 0.0
             total = 0.0
             @orders.each do |order|
-              sku = []
-              desc = []
-              csv_line = []
-              promo_code = []
-              csv_line << order.completed_at
-              order.line_items.each do |line_item|               
-                sku << line_item.variant.sku
-                desc << line_item.variant.name
+              last_index = order.line_items.size - 1
+              order.line_items.each_with_index do |line_item, index|
+                csv_line = []
+                csv_line << order.completed_at
+                csv_line << line_item.variant.sku
+                csv_line << line_item.variant.name
+                csv_line << line_item.price
+                csv_line << line_item.quantity
+                csv_line << (line_item.price * line_item.quantity)
+                if index == last_index
+                  promo_code = []
+                  csv_line << order.display_tax_total
+                  order.adjustments.promotion.each do |promo|
+                    promo_code << promo.originator.promotion.code
+                  end
+                  csv_line << promo_code.join(', ')
+                  csv_line << order.promo_total.to_f
+                  csv_line << order.display_total
+                else
+                  csv_line << ''
+                  csv_line << ''
+                  csv_line << ''
+                  csv_line << ''
+                end
+                csv << csv_line
               end
-              csv_line << sku.join(', ')
-              csv_line << desc.join(', ')
-              csv_line << order.display_item_total
-              csv_line << order.display_tax_total
-              order.adjustments.promotion.each do |promo|
-                promo_code << promo.originator.promotion.code
-              end
-              csv_line << promo_code.join(', ')
-              csv_line << order.promo_total.to_f
-              csv_line << order.display_total
-              csv << csv_line
               subtotal += order.item_total.to_f
               tax += order.tax_total.to_f
               discount += order.promo_total.to_f
@@ -161,7 +169,7 @@ module OrderExport
             end
             # Format money
             subtotal, tax, discount, total = [subtotal, tax, discount, total].map {|item| Spree::Money.new(item, { currency: Spree::Config[:currency] })}
-            csv << ['Grand Total','','',subtotal,tax,'',discount,total]
+            csv << ['Grand Total','','','','',subtotal,tax,'',discount,total]
           end
 
           if format_gt && format_lt
@@ -171,7 +179,6 @@ module OrderExport
           end
           send_data orders_export, :type => 'text/csv', :filename => "Sales-Report-#{file_time}.csv"
         end
-        
       end
     end
   end
