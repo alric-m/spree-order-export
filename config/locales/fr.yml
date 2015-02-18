@@ -1,0 +1,25 @@
+fr:
+  order_export: Export de Commandes
+  sales_report: Process Sales By Date
+  order_export_description: Export des commandes basé sur les informations des line items.
+  only_show_complete_orders: Ne montrer que les commandes complete ?
+  order_export_help: "Use the filters to adjust the date ranges for the orders you wish to export, and then click the 'Search' button to generate the file."
+  sales_report_help: "Use the filters to adjust the date ranges for the sales report you wish to export, and then click the 'Search' button to generate the file."
+  order_export_ext:
+      header:
+          last_updated: Dernière modifications
+          completed_at: Completé le
+          number: Commande N°
+          name: Nom du client
+          address_1: Adresse client
+          address_2: Adresse client (suite)
+          city: Ville client
+          state: État client
+          zipcode: Code postal client
+          country: Pays client
+          phone: Téléphone client
+          email: Email client
+          variant_name: Nom du produit
+          quantity: Quantity
+          order_total: Total de la commande
+          payment_method: Méthode de paiement
