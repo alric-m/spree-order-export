@@ -18,11 +18,11 @@ Gem::Specification.new do |s|
     s.specification_version = 4
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
-      s.add_runtime_dependency(%q<spree_core>, [">= 0.30.1"])
+      s.add_runtime_dependency(%q<spree_core>)
     else
-      s.add_dependency(%q<spree_core>, [">= 0.30.1"])
+      s.add_dependency(%q<spree_core>)
     end
   else
-    s.add_dependency(%q<spree_core>, [">= 0.30.1"])
+    s.add_dependency(%q<spree_core>)
   end
 end
