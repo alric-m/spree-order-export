@@ -10,10 +10,8 @@ module OrderExport
       Dir.glob(File.join(File.dirname(__FILE__), "../app/**/*_decorator*.rb")) do |c|
         Rails.env.production? ? require(c) : load(c)
       end
-      reports = {:order_export => {:name => "Order Export", :description => "Order Export Description"},
-                 :sales_report => {:name => "Sales Report", :description => "Sales Report By Date"}}
+      reports = {:order_export => {:name => "Order Export", :description => "Order Export Description"}}
       Spree::Admin::ReportsController::available_reports.merge! reports
-      Spree::Admin::ReportsController::available_reports.delete(:sales_total)
       Spree::Admin::ReportsController.send(:require, RUBY_VERSION.split('.')[1].to_i > 8 ? 'csv' : 'fastercsv')
       Spree::Admin::ReportsController.send(:include, OrderExport::ReportsControllerExt)
     end
